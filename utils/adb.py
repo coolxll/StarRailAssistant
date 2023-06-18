@@ -29,6 +29,7 @@ class ADB:
             :param order: ADB端口
         """
         shell = [self.adb_path, "connect", self.order]
+        shell = ' '.join(shell)
         result = run(shell, shell=True, capture_output=True)
         return result.stdout
 
@@ -38,6 +39,7 @@ class ADB:
             关闭ADB
         """
         shell = [self.adb_path, "kill-server"]
+        shell = ' '.join(shell)
         run(shell, shell=True, stdout=DEVNULL)
         
     def input_swipe(self, pos1=(919,617), pos2=(919,908), time: int=100):
@@ -50,6 +52,7 @@ class ADB:
             :param time: 操作时间
         """
         shell = [self.adb_path, "-s", self.order, "shell", "input", "swipe", str(pos1[0]), str(pos1[1]), str(pos2[0]), str(pos2[1]), str(int(time))]
+        shell = ' '.join(shell)
         run(shell, shell=True) 
 
     def input_tap(self, pos=(880,362)):
@@ -60,6 +63,7 @@ class ADB:
             :param pos: 坐标
         """
         shell = [self.adb_path, "-s", self.order, "shell", "input", "tap", str(pos[0]), str(pos[1])]
+        shell = ' '.join(shell)
         run(shell, shell=True) 
 
     def screencast(self, path = "/sdcard/Pictures/screencast.png") -> Image:
@@ -71,8 +75,10 @@ class ADB:
         """
         img_name = path.split("/")[-1]
         shell = [self.adb_path, "-s", self.order, "shell", "screencap", "-p", path]
+        shell = ' '.join(shell)
         run(shell, shell=True)
-        shell = [self.adb_path, "-s", self.order, "pull", path]
+        shell = [self.adb_path, "-s", self.order, "pull", path, './']
+        shell = ' '.join(shell)
         run(shell, shell=True, stdout=DEVNULL) 
         img = Image.open(f"./{img_name}")
         return img

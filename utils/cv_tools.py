@@ -10,7 +10,10 @@ Copyright (c) 2023 by Xe-No, All Rights Reserved.
 
 import os
 import time
-import win32api
+try:
+    import win32api
+except:
+    pass
 import cv2 as cv
 import numpy as np
 import pygetwindow as gw

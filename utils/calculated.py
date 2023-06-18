@@ -3,7 +3,10 @@
 """
 import re
 import time
-import win32api
+try:
+    import win32api
+except:
+    pass
 import cv2 as cv
 import numpy as np
 import pygetwindow as gw
@@ -264,8 +267,8 @@ class calculated:
             :param threshold: 可信度阈值
             :param flag: 是否必须找到
         """
-        target_path = target_path.replace("temp\\","temp\\pc\\") if self.platform == _("PC") else target_path.replace("temp\\","temp\\mnq\\")
-        temp_name = target_path.split("\\")[-1].split(".")[0]
+        target_path = target_path.replace("temp/","temp/pc/") if self.platform == _("PC") else target_path.replace("temp/","temp/mnq/")
+        temp_name = target_path.split("/")[-1].split(".")[0]
         join = False # 强制进行传统模板匹配
         temp_ocr = {
             "orientation_1": _("星轨航图"),

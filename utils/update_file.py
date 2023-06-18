@@ -282,7 +282,7 @@ class update_file:
             :param zip_path: 需要移动的文件地址
             :param name: 更新的文件名称
         """
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        asyncio.set_event_loop_policy(None)
         log.info(_("[资源文件更新]即将资源文件更新，本操作会覆盖本地{name}文件..").format(name=name))
         check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,False,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name))
         if check_file_status == "rm_all":

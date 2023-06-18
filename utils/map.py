@@ -5,7 +5,7 @@ from .requests import webhook_and_log
 
 
 class Map:
-    def __init__(self,title = _("崩坏：星穹铁道"), platform=_("PC"),order="127.0.0.1:62001",adb_path="temp\\adb\\adb"):
+    def __init__(self,title = _("崩坏：星穹铁道"), platform=_("PC"),order="127.0.0.1:62001",adb_path="temp/adb/adb"):
         """
         参数: 
             :param platform: 运行设备
@@ -45,9 +45,9 @@ class Map:
 
     def start_map(self, map, old=True):
         map_data = (
-            read_json_file(f"map\\old\\{map}.json")
+            read_json_file(f"map/old/{map}.json")
             if old
-            else read_json_file(f"map\\{map}.json")
+            else read_json_file(f"map/{map}.json")
         )
         map_filename = map
         # 开始寻路
