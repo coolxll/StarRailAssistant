@@ -304,7 +304,7 @@ if __name__ == "__main__":
         print(_("\033[0;31;40m星穹铁道小助手为开源项目，完全免费\n如果你是购买的那么你被骗了\n开源仓库地址: https://github.com/Starry-Wind/StarRailAssistant\033[0m"))
         sra.load_plugin()
         sra.run_plugins()
-        if not pyuac.isUserAdmin():
+        if False and not pyuac.isUserAdmin():
             pyuac.runAsAdmin()
         else:
             def select():

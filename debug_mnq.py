@@ -12,5 +12,4 @@ _ = t.gettext
 sra = SRA()
 sra.load_plugin()
 sra.run_plugins()
-sra.main_start()
 sra.main(platform=_("模拟器"), start='3-1_1')

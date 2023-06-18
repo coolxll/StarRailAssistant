@@ -60,7 +60,7 @@ class Map:
             key = list(map.keys())[0]
             value = map[key]
             if key in ["w", "s", "a", "d"]:
-                pos = self.calculated.move(key, value, map_name)
+                pos = self.calculated.move(key, value, map)
                 #num = map_data["map"].index(map)
             elif key == "f":
                 self.calculated.teleport(key, value)
@@ -104,7 +104,7 @@ class Map:
             for map in map_list:
                 # 选择地图
                 map = map.split('.')[0]
-                map_data = read_json_file(f"map/{map}.json") if self.platform == _("PC") else read_json_file(f"map\\mnq\\{map}.json")
+                map_data = read_json_file(f"map/{map}.json") if self.platform == _("PC") else read_json_file(f"map/mnq/{map}.json")
                 name:str = map_data['name']
                 author = map_data['author']
                 start_dict = map_data['start']
