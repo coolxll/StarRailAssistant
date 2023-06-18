@@ -125,7 +125,8 @@ class SRA:
         adb_path = read_json_file(CONFIG_FILE_NAME, False).get('adb_path', "temp\\adb\\adb")
         map_instance = map_word(game_title, platform, order, adb_path)
         simulated_universe =Simulated_Universe(game_title, platform, order, adb_path)
-        start, role_list = self.choose_map(map_instance, type, platform)
+        if not start:
+            start, role_list = self.choose_map(map_instance, type, platform)
         if start:
             if platform == "PC":
                 log.info(_("脚本将自动切换至游戏窗口，请保持游戏窗口激活"))
