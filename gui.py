@@ -2,7 +2,7 @@
 Author: Night-stars-1 nujj1042633805@gmail.com
 Date: 2023-05-29 16:54:51
 LastEditors: Night-stars-1 nujj1042633805@gmail.com
-LastEditTime: 2023-06-08 20:44:45
+LastEditTime: 2023-06-17 23:25:03
 Description: 
 
 Copyright (c) 2023 by Night-stars-1, All Rights Reserved. 
@@ -16,6 +16,7 @@ root.withdraw()
 try:
     from utils.exceptions import Exception
     import time
+    import psutil
     import flet as ft
     from re import sub
     from cryptography.fernet import Fernet
@@ -23,7 +24,8 @@ try:
 
     from utils.log import log,level
     from utils.map import Map as map_word
-    from utils.config import read_json_file,modify_json_file , CONFIG_FILE_NAME, _
+    from utils.config import read_json_file,modify_json_file, read_maps, CONFIG_FILE_NAME, _
+    import utils.config
     from utils.update_file import update_file
     from utils.calculated import calculated
     from get_width import get_width
@@ -33,12 +35,16 @@ except:
 
 sra = SRA()
 
+check_console = True
+
 def page_main(page: ft.Page):
     '''
     if page.session.contains_key("updata_log"):
         page.session.remove("updata_log")
     '''
-    map_dict = map_word(platform=_("模拟器")).map_list_map
+    __, map_dict = read_maps(platform=_("PC"))
+    print(map_dict)
+    #map_dict = map_word(platform=_("模拟器")).map_list_map
     VER = str(read_json_file("config.json").get("star_version",0))+"/"+str(read_json_file("config.json").get("temp_version",0))+"/"+str(read_json_file("config.json").get("map_version",0))
     img_url = [
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N70a4AAAAAElFTkSuQmCC",
@@ -151,7 +157,8 @@ def page_main(page: ft.Page):
             time.sleep(0.5)
             get_width(_("崩坏：星穹铁道"))
             import pyautogui # 缩放纠正
-        map_word(platform=platform.value).auto_map(start)
+        order = read_json_file(CONFIG_FILE_NAME).get("adb", "127.0.0.1:62001")
+        map_word(platform=platform.value,order=order).auto_map(start)
         add(ft.ElevatedButton(_("返回"), on_click=to_page_main))
 
     def to_page_main(e):
@@ -204,7 +211,8 @@ def page_main(page: ft.Page):
                 'keep_folder': ['.git', 'logs', 'temp', 'map', 'tmp', 'venv'],
                 'keep_file': ['config.json', 'version.json', 'star_list.json', 'README_CHT.md', 'README.md'],
                 'zip_path': "StarRailAssistant-main/",
-                'name': _("脚本")
+                'name': _("脚本"),
+                'delete_file': False
             },
             _("地图"):{
                 'url_proxy': ghproxy,
@@ -217,7 +225,8 @@ def page_main(page: ft.Page):
                 'keep_folder': [],
                 'keep_file': [],
                 'zip_path': "map/",
-                'name': _("地图")
+                'name': _("地图"),
+                'delete_file': True
             },
             _("图片"):{
                 'url_proxy': ghproxy,
@@ -230,9 +239,12 @@ def page_main(page: ft.Page):
                 'keep_folder': [],
                 'keep_file': [],
                 'zip_path': "map/",
-                'name': _("图片")
+                'name': _("图片"),
+                'delete_file': True
             },
         }
+        if not check_console:
+            del data[_("脚本")]
         def add_updata_log(message):
             message = message[:-1]
             text.value = sub(r"(.{67})", "\\1\r\n", message)
@@ -282,8 +294,6 @@ def page_main(page: ft.Page):
             "BlueStacks": "127.0.0.1:5555",
             "天天安卓模拟器": "127.0.0.1:5037",
         }
-        github_proxy_list = ['https://ghproxy.com/', 'https://ghproxy.net/', 'hub.fgit.ml', '']
-        rawgithub_proxy_list = ['https://ghproxy.com/', 'https://ghproxy.net/', 'raw.fgit.ml', 'raw.iqiq.io', '']
         simulator_keys = list(simulator.keys())
         simulator_values = list(simulator.values())
         user_adb = config.get("adb", "127.0.0.1:62001")
@@ -292,11 +302,28 @@ def page_main(page: ft.Page):
             simulator_keys.append(_("自定义"))
             simulator[_("自定义")] = user_adb
         adb = simulator_keys[simulator_values.index(user_adb)]
-        github_proxy = config.get("github_proxy", "")
-        rawgithub_proxy = config.get("rawgithub_proxy", "")
+
+        language_dict = {
+            "简体中文": "zh_CN",
+            "繁體中文": "zh_TC",
+            #"English": "EN"
+        }
+        language = config.get("language", "")
+        language = list(filter(lambda key: language_dict[key] == language, language_dict))[0]
+
+        fighting_list = [_('没打开'), _('打开了'), _('这是什么')]
+        fighting = fighting_list[config.get("auto_battle_persistence", 0)]
+        print(fighting)
+
+        github_proxy_list = ['https://ghproxy.com/', 'https://ghproxy.net/', 'hub.fgit.ml', "不设置代理"]
+        github_proxy = config.get("github_proxy", 'https://ghproxy.com/') 
+        rawgithub_proxy_list = ['https://ghproxy.com/', 'https://ghproxy.net/', 'raw.fgit.ml', 'raw.iqiq.io', "不设置代理"]
+        rawgithub_proxy = config.get("rawgithub_proxy", 'https://ghproxy.com/')
+
         open_map = config.get("open_map", "m")
         level = config.get("level", "INFO")
         adb_path = config.get("adb_path", "temp\\adb\\adb")
+
         simulator_dd = ft.Dropdown(
                 label=_("模拟器"),
                 hint_text=_("选择你运行的模拟器"),
@@ -329,6 +356,20 @@ def page_main(page: ft.Page):
                 value=level,
                 width=200,
             )
+        language_dd = ft.Dropdown(
+                label=_("游戏语言"),
+                hint_text=_("设置星穹铁道小助手的语言"),
+                options=[ft.dropdown.Option(i) for i in list(language_dict.keys())],
+                value=language,
+                width=200,
+            )
+        fighting_dd = ft.Dropdown(
+                label= _("你游戏打开自动战斗了吗？"),
+                hint_text= _("你游戏打开自动战斗了吗？"),
+                options=[ft.dropdown.Option(i) for i in fighting_list],
+                value=fighting,
+                width=200,
+            )
         adb_path_text = ft.Text(adb_path, size=20)
         def pick_files_result(e: ft.FilePickerResultEvent):
             adb_path_text.value = e.files[0].path
@@ -336,12 +377,15 @@ def page_main(page: ft.Page):
         pick_files_dialog = ft.FilePicker(on_result=pick_files_result)
         open_map_tf = ft.TextField(label=_("打开地图按钮"), value=open_map, width=200)
         def save(e):
-            modify_json_file(CONFIG_FILE_NAME, "github_proxy", github_proxy_dd.value)
-            modify_json_file(CONFIG_FILE_NAME, "rawgithub_proxy", rawgithub_proxy_dd.value)
+            modify_json_file(CONFIG_FILE_NAME, "github_proxy", "" if github_proxy_dd.value == "不设置代理" else github_proxy_dd.value)
+            modify_json_file(CONFIG_FILE_NAME, "rawgithub_proxy", "" if rawgithub_proxy_dd.value == "不设置代理" else rawgithub_proxy_dd.value)
             modify_json_file(CONFIG_FILE_NAME, "open_map", open_map_tf.value)
             modify_json_file(CONFIG_FILE_NAME, "level", level_dd.value)
             modify_json_file(CONFIG_FILE_NAME, "adb", simulator[simulator_dd.value])
             modify_json_file(CONFIG_FILE_NAME, "adb_path", adb_path_text.value)
+            modify_json_file(CONFIG_FILE_NAME, "language", language_dict[language_dd.value])
+            modify_json_file(CONFIG_FILE_NAME, "auto_battle_persistence", fighting_list.index(fighting_dd.value))
+            modify_json_file(CONFIG_FILE_NAME, "start", True)
             to_page_main(page)
         page.clean()
         page.overlay.append(pick_files_dialog)
@@ -354,6 +398,8 @@ def page_main(page: ft.Page):
             rawgithub_proxy_dd,
             level_dd,
             open_map_tf,
+            language_dd,
+            fighting_dd,
             ft.Row(
                 [
                     adb_path_text,
@@ -430,7 +476,10 @@ def page_main(page: ft.Page):
     pb = ft.ProgressBar(width=400) #进度条 宽度可更改 pb.width = 400
     ## 更新选项卡
     Column = ft.Column()
-    log_text = ft.Column()
+    log_text = ft.Column(
+        width=page.window_width,
+        spacing=0
+    )
     # 背景图片
     if not page.session.get("start"):
         img_url2 = img_url[read_json_file(CONFIG_FILE_NAME).get("img",0)]
@@ -524,18 +573,38 @@ def page_main(page: ft.Page):
     page.theme = ft.Theme(font_family="Kanit")
     sra.option_dict = {
     }
-    button_dict = sra.run_plugins()[0]
-    add(
-        [
+    button_dict = sra.run_plugins()[-1]
+    if check_console:
+        page_list = [
             ft.Text(_("星穹铁道小助手"), size=50),
             ft.Text(VER, size=20),
             ft.ElevatedButton(_("大世界"), on_click=word),
             ft.ElevatedButton(_("模拟宇宙")),
-        ]+[ft.ElevatedButton(i, on_click=lambda x:button_dict[i](page)) for i in list(button_dict.keys())]+
-        [
+        ]+[ft.ElevatedButton(i, on_click=lambda x:button_dict[i](page)) for i in list(button_dict.keys())]+[
             ft.ElevatedButton(_("更新资源"), on_click=updata),
             ft.ElevatedButton(_("编辑配置"), on_click=set_config),
-        ],
+        ]
+    else:
+        page_list = [
+            ft.Text(_("星穹铁道小助手"), size=50),
+            ft.Text(VER, size=20),
+            ft.ElevatedButton(_("大世界"), on_click=word),
+            ft.ElevatedButton(_("模拟宇宙")),
+        ]+[ft.ElevatedButton(i, on_click=lambda x:button_dict[i](page)) for i in list(button_dict.keys())]+[
+            ft.ElevatedButton(_("更新资源"), on_click=updata),
+            ft.ElevatedButton(_("编辑配置"), on_click=set_config),
+        ]
+    if read_json_file(CONFIG_FILE_NAME, False).get('temp_version') == "0" or read_json_file(CONFIG_FILE_NAME, False).get('map_version') == "0":
+        page_list = [
+            ft.Text(_("星穹铁道小助手"), size=50),
+            ft.Text(VER, size=20),
+            ft.ElevatedButton(_("更新资源"), on_click=updata),
+            ft.ElevatedButton(_("编辑配置"), on_click=set_config),
+        ]
+        if not read_json_file(CONFIG_FILE_NAME, False).get('start'):
+            page_list.pop(2)
+    add(
+        page_list,
         left_page=[about_ib]
     )
 

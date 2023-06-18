@@ -49,7 +49,7 @@ class update_file:
         """
         for i,data in enumerate(json_path):
             file_path = Path() / data["path"]
-            if not os.path.exists(file_path):
+            if not os.path.exists(file_path) and str(file_path) not in keep_file:
                 return False, file_path
             if os.path.isfile(file_path) and str(file_path) not in keep_file:
                 log.debug(hashlib.md5(file_path.read_bytes()).hexdigest())
@@ -83,8 +83,6 @@ class update_file:
                     os.remove(item_path)
 
     async def move_file(self, src_folder: Path, dst_folder,keep_folder: Optional[List[str]] = [],keep_file: Optional[List[str]] = []) -> None:
-
-
         for item in get_file(src_folder,keep_folder,keep_file, True):
             if dst_folder in item:
                 dst_path = item.replace(src_folder, "./")
@@ -105,6 +103,23 @@ class update_file:
                 shutil.copy(src_path, dst_path)
         """
 
+    async def copy_files(self, source_path:Path, destination_path:Path, copy:List=[]):
+        #if os.path.exists(new_folder):
+            #shutil.rmtree(new_folder)
+        #os.makedirs(new_folder, exist_ok=True)
+        # 创建目标文件夹
+        os.makedirs(destination_path, exist_ok=True)
+        # 遍历文件和文件夹列表
+        for item in copy:
+            item_path = source_path / item
+            destination2_path = destination_path / item
+            # 如果是文件
+            if os.path.isfile(item_path):
+                shutil.copy2(item_path, destination_path)
+            # 如果是文件夹
+            elif os.path.isdir(item_path):
+                shutil.copytree(item_path, destination2_path, dirs_exist_ok=True)
+            
     async def update_file(self, url_proxy: str="",
                         raw_proxy: str="",
                         rm_all: bool=False, 
@@ -116,7 +131,8 @@ class update_file:
                         keep_folder: Optional[List[str]] = [],
                         keep_file: Optional[List[str]] = [],
                         zip_path: str="",
-                        name: str="") -> bool:
+                        name: str="",
+                        delete_file: bool=False) -> bool:
         """
         说明：
             更新文件
@@ -133,6 +149,7 @@ class update_file:
             :param keep_file: 保存的文件
             :param zip_path: 需要移动的文件地址
             :param name: 更新的文件名称
+            :param delete_file: 是否删除文件
         """
         global tmp_dir
 
@@ -173,6 +190,8 @@ class update_file:
         local_version = read_json_file(CONFIG_FILE_NAME).get(f"{type}_version", "0")
 
         if remote_version != local_version:
+            if name == _("脚本"):
+                await self.copy_files(Path(), Path() / "StarRailAssistant_backup", ["utils", "temp", "map", "config.json", "get_width.py", "Honkai_Star_Rail.py", "gui.py"])
             log.info(_("[资源文件更新]本地版本与远程版本不符，开始更新资源文件->{url_zip}").format(url_zip=url_zip))
             for __ in range(3):
                 try:
@@ -192,7 +211,8 @@ class update_file:
 
 
             #shutil.rmtree("..\StarRailAssistant-beta-2.7")
-            #await self.remove_file(unzip_path, keep_folder, keep_file)
+            if delete_file:
+                await self.remove_file(unzip_path, keep_folder, keep_file)
             await self.move_file(os.path.join(tmp_dir, zip_path), unzip_path, [], keep_file)
 
             log.info(_("[资源文件更新]正在校验资源文件"))
@@ -265,7 +285,8 @@ class update_file:
                         keep_folder: Optional[List[str]] = [],
                         keep_file: Optional[List[str]] = [],
                         zip_path: str="",
-                        name: str=""):
+                        name: str="",
+                        delete_file: bool=False):
         """
         说明：
             更新文件
@@ -281,13 +302,14 @@ class update_file:
             :param keep_file: 保存的文件
             :param zip_path: 需要移动的文件地址
             :param name: 更新的文件名称
+            :param delete_file: 是否删除文件
         """
         asyncio.set_event_loop_policy(None)
         log.info(_("[资源文件更新]即将资源文件更新，本操作会覆盖本地{name}文件..").format(name=name))
-        check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,False,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name))
+        check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,False,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name,delete_file))
         if check_file_status == "rm_all":
             time.sleep(3)
-            check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,True,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name))
+            check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,True,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name,delete_file))
         elif check_file_status == "download_error":
-            check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,False,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name))
+            check_file_status = asyncio.run(self.update_file(url_proxy,raw_proxy,False,skip_verify,type,version,url_zip,unzip_path,keep_folder,keep_file,zip_path,name,delete_file))
     
