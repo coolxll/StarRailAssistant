@@ -162,6 +162,7 @@ def read_maps(platform):
         读取地图
     """
     map_list = get_file('./map') if platform == _("PC") else get_file('./map/mnq')
+    map_list = sorted(map_list)
     print(map_list)
     map_list_map = {}
     for map_ in map_list:
