@@ -2,10 +2,11 @@ import os
 import orjson
 import gettext
 
+from orjson import JSONDecodeError
+
 from .log import log
 
 CONFIG_FILE_NAME = "config.json"
-
 
 def normalize_file_path(filename):
     # 尝试在当前目录下读取文件
@@ -80,6 +81,7 @@ def init_config_file(real_width, real_height, file_name = CONFIG_FILE_NAME):
                         "star_version": "0",
                         "open_map": "m",
                         "level": "INFO",
+                        "debug": False,
                         "adb": "127.0.0.1:62001",
                         "adb_path": "temp\\adb\\adb",
                         "proxies": "",
@@ -87,6 +89,11 @@ def init_config_file(real_width, real_height, file_name = CONFIG_FILE_NAME):
                         "move_excursion": 0,
                         "move_division_excursion": 1,
                         "sprint": False,
+                        "join_time": {
+                            "pc": 8,
+                            "mnq": 15
+                        },
+                        "deficiency": True
                     },option = orjson.OPT_PASSTHROUGH_DATETIME | orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2
                 )
             )
@@ -100,7 +107,7 @@ def init_config_file(real_width, real_height, file_name = CONFIG_FILE_NAME):
             )
 
 
-def get_file(path, exclude=[], exclude_file=None, get_path=False) -> list[str]:
+def get_file(path, exclude=[], exclude_file=None, get_path=False, only_place=False) -> list[str]:
     """
     获取文件夹下的文件
     """
@@ -109,21 +116,22 @@ def get_file(path, exclude=[], exclude_file=None, get_path=False) -> list[str]:
     file_list = []
     for root, dirs, files in os.walk(path):
         add = True
-        for i in exclude:
-            if i in root:
-                add = False
-        if add:
-            for file in files:
-                add = True
-                for ii in exclude_file:
-                    if ii in file:
-                        add = False
-                if add:
-                    if get_path:
-                        path = root + "/" + file
-                        file_list.append(path.replace("//", "/"))
-                    else:
-                        file_list.append(file)
+        if (dirs==[] and only_place) or not only_place:
+            for i in exclude:
+                if i in root:
+                    add = False
+            if add:
+                for file in files:
+                    add = True
+                    for ii in exclude_file:
+                        if ii in file:
+                            add = False
+                    if add:
+                        if get_path:
+                            path = root + "/" + file
+                            file_list.append(path.replace("//", "/"))
+                        else:
+                            file_list.append(file)
     return file_list
 
 def get_folder(path) -> list[str]:
@@ -161,7 +169,7 @@ def read_maps(platform):
     说明:
         读取地图
     """
-    map_list = get_file('./map') if platform == _("PC") else get_file('./map/mnq')
+    map_list = get_file('./map',only_place=True) if platform == _("PC") else get_file('./map/mnq',only_place=True)
     map_list = sorted(map_list)
     print(map_list)
     map_list_map = {}
@@ -174,6 +182,7 @@ def read_maps(platform):
             value = {}
         value[key2] = map_data["name"]
         map_list_map[key1] = value
+    map_list.sort()
     log.debug(map_list)
     log.debug(map_list_map)
     return map_list, map_list_map

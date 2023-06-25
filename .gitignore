@@ -137,3 +137,5 @@ build.bat
 locale/.DS_Store
 .DS_Store
 /map/
+*.pot
+*.po
