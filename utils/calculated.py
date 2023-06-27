@@ -444,7 +444,7 @@ class calculated:
                     #points = self.calculated(result, target.shape)
                     self.Click(result["max_loc"])
                     break
-                if time.time() - start_time > 5 and "point" in temp_name:
+                if time.time() - start_time > 5 and "point" in temp_name and self.platform == _("PC"):
                     start_x = (self.window.left+self.window.right) // 2
                     start_y = (self.window.top+self.window.bottom) // 2
                     import pyautogui # 写这里是为了防止缩放比获取错误
