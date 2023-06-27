@@ -588,7 +588,7 @@ class calculated:
             视角转动
         """
         # 该公式为不同缩放比之间的转化
-        scaling = self.data["scaling"]
+        scaling = self.data.get('scaling',1)
         dx = int(x * scaling)
         i = int(dx/200)
         last = dx - i*200
