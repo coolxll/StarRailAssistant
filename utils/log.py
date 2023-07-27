@@ -96,7 +96,7 @@ level = data.get("level","INFO")
 log = logger.bind(file=path_log)
 log.remove()
 log.add(sys.stdout, level=level, colorize=True,
-            format="<cyan>{module}</cyan>.<cyan>{function}</cyan>"
+            format="{time:HH:mm:ss} - <cyan>{module}</cyan>.<cyan>{function}</cyan>"
                     ":<cyan>{line}</cyan> - "+f"<cyan>{VER}</cyan> - "
                     "<level>{message}</level>",filter=FileFilter(path_log))
 
