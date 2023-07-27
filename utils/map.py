@@ -155,10 +155,18 @@ class Map:
                                 self.calculated.click_target("temp/orientation_1.jpg", 0.98)
                                 self.calculated.click_target("temp/orientation_{num}.png".format(num=str(int(key.split("map_")[-1][0])+1)), 0.98)
                                 self.calculated.click_target(key.split("_point")[0], 0.98)
-                                self.calculated.click_target(key, 0.98)
+                                threshold = 0.98
+                                if key.startswith('temp/map_3-5_point_'):
+                                    threshold = 0.94
+                                if key.startswith('temp/map_3-6_point_'):
+                                    threshold = 0.928
+                                self.calculated.click_target(key, threshold)
                                 wrong_map = False
                             else:
-                                self.calculated.click_target(key, 0.93)
+                                threshold = 0.93
+                                if key.startswith('temp/map_3-6_point_'):
+                                    threshold = 0.928
+                                self.calculated.click_target(key, threshold)
                     #time.sleep(3)
                     count = self.calculated.wait_join()
                     log.info(_('地图加载完毕，加载时间为 {count} 秒').format(count=count))

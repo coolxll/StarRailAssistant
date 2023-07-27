@@ -8,8 +8,9 @@ loc = ('zh_CN','UTF-8')
 t = gettext.translation('sra', 'locale', languages=[loc[0]])
 _ = t.gettext
 
-
+''
 sra = SRA()
 sra.load_plugin()
 sra.run_plugins()
-sra.main(platform=_("模拟器"), start='3-2_1')
+
+sra.main(platform=_("模拟器"), start='2-3_1')
