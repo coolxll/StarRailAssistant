@@ -49,7 +49,7 @@ class Map:
             for i in range(6):
                 self.calculated.img_click((366, 660))
 
-    def start_map(self, map, old=True):
+    def start_map(self, map, old=True, skip=0):
         map_data = (
             read_json_file(f"map/old/{map}.json")
             if old
@@ -59,6 +59,8 @@ class Map:
         # 开始寻路
         log.info(_("开始寻路"))
         for map_index, map in enumerate(map_data["map"]):
+            if skip > 0 and map_index <= skip:
+                continue
             self.calculated.monthly_pass()
             log.info(_("执行{map_filename}文件:{map_index}/{map_data2} {map}").format(map_filename=map_filename,map_index=map_index+1,map_data2=len(map_data['map']),map=map))
             key = list(map.keys())[0]
