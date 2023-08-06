@@ -903,7 +903,7 @@ class calculated:
             result = self.scan_screenshot(self.finish, pos=(0, 95, 100, 100))
             if result["max_val"] < 0.95:
                 return endtime
-            time.sleep(0.1)
+            time.sleep(1)
 
     def switch_window(self, dt=0.1):
         if self.platform == _("PC"):
