@@ -49,9 +49,9 @@ class Map:
             for i in range(6):
                 self.calculated.img_click((366, 660))
 
-    def start_map(self, map, old=False, skip=0):
+    def start_map(self, map, old=True, skip=0):
         map_data = (
-            read_json_file(f"map/old/{map}.json")
+            read_json_file(f"map/mnq/{map}.json")
             if old
             else read_json_file(f"map/{map}.json")
         )

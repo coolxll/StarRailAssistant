@@ -13,4 +13,4 @@ sra = SRA()
 sra.load_plugin()
 sra.run_plugins()
 
-sra.main(platform=_("模拟器"), start='3-4_3')
+sra.main(platform=_("模拟器"), start='2-5_1')

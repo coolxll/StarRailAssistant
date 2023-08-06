@@ -136,6 +136,5 @@ build.bat
 .github/.DS_Store
 locale/.DS_Store
 .DS_Store
-/map/
 *.pot
 *.po
